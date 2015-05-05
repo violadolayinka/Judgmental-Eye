@@ -24,6 +24,12 @@ class User(db.Model):
     age = db.Column(db.Integer, nullable=True)
     zipcode = db.Column(db.String(15), nullable=True)
 
+    def __repr__(self):
+        """Provide helpful representation when printed."""
+
+        return "<User user_id=%s email=%s>" % (self.user_id, self.email)
+    
+
 class Movie(db.Model):
     """Movies in ratings website."""
 
@@ -44,6 +50,8 @@ class Ratings(db.Model):
     user_id = db.Column(db.Integer, nullable=False)
     movie_id = db.Column(db.Integer, nullable=False)
     movie_score = db.Column(db.Integer, nullable=False)
+
+
 
 
 ##############################################################################
