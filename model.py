@@ -1,7 +1,7 @@
 """Models and database functions for Ratings project."""
 
 from flask_sqlalchemy import SQLAlchemy
-
+from datetime import datetime
 # This is the connection to the SQLite database; we're getting this through
 # the Flask-SQLAlchemy helper library. On this, we can find the `session`
 # object, where we do most of our interactions (like committing, etc.)
@@ -28,7 +28,7 @@ class User(db.Model):
         """Provide helpful representation when printed."""
 
         return "<User user_id=%s email=%s>" % (self.user_id, self.email)
-    
+
 
 class Movie(db.Model):
     """Movies in ratings website."""
@@ -40,6 +40,11 @@ class Movie(db.Model):
     release_date = db.Column(db.DateTime, nullable=False)
     imdb_url = db.Column(db.String, nullable=False)
 
+    def __repr__(self):
+        """Provide helpful representation when printed."""
+        release_date = self.release_date.strftime("%B %d, %Y")
+        return "<Movies movie_id=%d movie_name = %s release_date=%s >" % (self.movie_id,self.movie_name, release_date)
+
 
 class Ratings(db.Model):
     """ Movie ratings"""
@@ -47,9 +52,18 @@ class Ratings(db.Model):
     __tablename__ = "ratings"
 
     ratings_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    user_id = db.Column(db.Integer, nullable=False)
-    movie_id = db.Column(db.Integer, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
+    movie_id = db.Column(db.Integer, db.ForeignKey('movies.movie_id'), nullable=False)
     movie_score = db.Column(db.Integer, nullable=False)
+
+    user = db.relationship("User", backref=db.backref("ratings", order_by=ratings_id))
+
+    movie = db.relationship("Movie", backref=db.backref("ratings", order_by=ratings_id))
+
+    def __repr__(self):
+        """Provide helpful representation when printed."""
+
+        return "<Ratings ratings_id=%d score=%d user_id=%d movie_id=%d>" % (self.ratings_id, self.movie_score, self.user_id, self.movie_id)
 
 
 
