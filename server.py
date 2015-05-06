@@ -1,11 +1,13 @@
 """Movie Ratings."""
+from flask import Flask, render_template, redirect, request, flash, session
+
+from model import User, Ratings, Movie, connect_to_db, db
 
 from jinja2 import StrictUndefined
 
-from flask import Flask
-from flask_debugtoolbar import DebugToolbarExtension
 
-from model import connect_to_db, db
+# from flask_debugtoolbar import DebugToolbarExtension
+
 
 
 app = Flask(__name__)
@@ -22,8 +24,42 @@ app.jinja_env.undefined = StrictUndefined
 def index():
     """Homepage."""
 
-    return "<html><body>Placeholder for the homepage.</body></html>"
+    return render_template("homepage.html")
 
+@app.route('/login')
+def login_page():
+    """Login Page showing login form."""
+
+    return render_template("login.html")
+
+@app.route('/login', methods=["POST"])
+def process_login():
+    """Processes login form from Login Page."""
+    login_email = request.form.get("email")
+    login_password = request.form.get("password")
+
+    user_object = User.query.filter_by(email=login_email).first()
+
+    if user_object: # query returns none if login_email not in database
+         user_password = user_object.password
+         if user_password == login_password:
+            session["logged_in_email"] = user_object.email #This keeps a user logged into the session while on site.
+            flash("Successfully logged in.")
+            print session
+         else:
+            flash("Password does not match user email.")  
+    else:
+        flash("No such email")
+        return redirect('/login')
+    
+    return redirect('/')
+
+@app.route("/users")
+def user_list():
+    """Show list of users."""
+
+    users = User.query.all()
+    return render_template("user_list.html", users=users)
 
 if __name__ == "__main__":
     # We have to set debug=True here, since it has to be True at the point
@@ -33,6 +69,6 @@ if __name__ == "__main__":
     connect_to_db(app)
 
     # Use the DebugToolbar
-    DebugToolbarExtension(app)
+    # DebugToolbarExtension(app)
 
     app.run()

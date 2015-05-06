@@ -5,7 +5,7 @@ from datetime import datetime
 from server import app
 
 # import time
-# start = time.time()
+start = time.time()
 
 
 def load_users():
