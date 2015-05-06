@@ -52,7 +52,29 @@ def process_login():
     else:
         flash("No such email")
         return redirect('/login')
-    
+
+@app.route('/registration')
+def registration():
+    """Registers a new user."""
+    return render_template("registration.html")
+
+@app.route('/registration', methods=["POST"])
+def process_registration():
+    """Adds new user to users database."""
+    user_email = request.form.get("email")
+    user_password = request.form.get("password")
+    user_age = request.form.get("age")
+    user_zipcode = request.form.get("zip-code")
+
+    user_object = User.query.filter_by(email=user_email).first()
+    if user_object: # query returns none if user_email not in database
+        flash("Email already registered.")
+    else:
+        user = User(email=user_email, password=user_password, age=user_age, zipcode=user_zipcode)
+        session.add(user)
+        session.commit()
+        flash("You have successfully registered.")      
+        return redirect('/login')
 
 @app.route('/logout')
 def logout():
