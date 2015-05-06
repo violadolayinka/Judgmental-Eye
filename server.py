@@ -69,11 +69,12 @@ def process_registration():
     user_object = User.query.filter_by(email=user_email).first()
     if user_object: # query returns none if user_email not in database
         flash("Email already registered.")
+        return redirect('/registration')
     else:
         user = User(email=user_email, password=user_password, age=user_age, zipcode=user_zipcode)
-        session.add(user)
-        session.commit()
-        flash("You have successfully registered.")      
+        db.session.add(user)
+        db.session.commit()
+        flash("You have successfully registered.  Please log in.")      
         return redirect('/login')
 
 @app.route('/logout')
