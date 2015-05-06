@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block content %}
+
+
+
+    <form id="form-registration" method="POST">
+
+        <h2>Please Register</h2>
+
+            <label for="email-field">Email Address</label>
+            <input type="email"
+                   name="email"
+                   placeholder="Email Address"
+                   required
+                   autofocus>
+      
+  
+            <label for="password-field">Password</label>
+            <input type="password"
+                   name="password"
+                   placeholder="Password"
+                   required>
+
+        <label for="age-field">Age</label>
+            <input type="number"
+                   name="age"
+                   placeholder="Enter Your Age">
+
+        <label for="zip-code-field">Zip Code</label>
+            <input type="text"
+                   name="zip-code"
+                   placeholder="Enter Your Zip Code">
+
+        <button type="submit">Register
+        </button>
+
+    </form>
+
+  
+{% endblock %}

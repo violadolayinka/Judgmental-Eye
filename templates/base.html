@@ -1,0 +1,33 @@
+<!doctype html>
+<html>
+<head>
+  <title>Ratings</title>
+</head>
+
+<body>
+  Ratings
+  <hr>
+  {% if 'logged_in_email' in session %}
+    <div> 
+        <p>You are logged in as {{ session['logged_in_email'] }} </p> 
+        <p><a href="/logout">Logout</a> </p> 
+    </div>
+  {% else %}
+     <div>
+     <p>You are not logged in. </p>
+     <p> <a href="/login">Login</a> </p>
+     <p> <a href="/register">Register</a> </p>
+    </div>
+     {% endif %}
+
+  {% block content %} put your content here {% endblock %}
+
+    <!-- Show flashed messages -->
+  {% with messages = get_flashed_messages() %}
+      {% for message in messages %}
+          <div style="background-color: yellow" class="alert alert-warning">{{ message }}</div>
+      {% endfor %}
+  {% endwith %}
+
+</body>
+</html>
