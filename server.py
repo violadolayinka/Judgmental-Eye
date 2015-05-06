@@ -45,7 +45,7 @@ def process_login():
          if user_password == login_password:
             session["logged_in_email"] = user_object.email #This keeps a user logged into the session while on site.
             flash("Successfully logged in.")
-            return redirect('/')
+            return redirect('/user/' + str(user_object.user_id))
          else:
             flash("Password does not match user email.") 
             return redirect('/login') 
@@ -85,13 +85,20 @@ def logout():
     flash("You have successfully logged out.") 
     return redirect('/')
 
-
 @app.route("/users")
 def user_list():
     """Show list of users."""
 
     users = User.query.all()
     return render_template("user_list.html", users=users)
+
+@app.route("/user/<int:id>")
+def display_user_info(id):
+    user_object = User.query.filter_by(user_id=id).one()
+    user_ratings = user_object.ratings
+
+    return render_template("user.html", user=user_object, user_ratings=user_ratings)
+
 
 if __name__ == "__main__":
     # We have to set debug=True here, since it has to be True at the point
