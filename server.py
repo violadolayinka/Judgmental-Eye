@@ -45,14 +45,23 @@ def process_login():
          if user_password == login_password:
             session["logged_in_email"] = user_object.email #This keeps a user logged into the session while on site.
             flash("Successfully logged in.")
-            print session
+            return redirect('/')
          else:
-            flash("Password does not match user email.")  
+            flash("Password does not match user email.") 
+            return redirect('/login') 
     else:
         flash("No such email")
         return redirect('/login')
     
+
+@app.route('/logout')
+def logout():
+    """Logs user out"""
+
+    del session["logged_in_email"]
+    flash("You have successfully logged out.") 
     return redirect('/')
+
 
 @app.route("/users")
 def user_list():
