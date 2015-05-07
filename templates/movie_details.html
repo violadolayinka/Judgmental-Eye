@@ -7,29 +7,31 @@
         <li> Movie Name:  {{ movie.movie_name }} </li>
         <li> Release Date:  {{ movie.release_date }}</li>
         <li><a href={{ movie.imdb_url }}>Go to this movie's IMDB page</a> </li>
-        <li> Ratings for this movie 
+  </ul>
+    {% if 'logged_in_email' in session %}
+  
+        <h3>Rate this movie</h3><form id="rating-form", method="POST">
+          <label>
+          <input type="radio" name="rating" value="1">1
+          <input type="radio" name="rating" value="2">2
+          <input type="radio" name="rating" value="3">3
+          <input type="radio" name="rating" value="4">4
+          <input type="radio" name="rating" value="5">5
+          </label>
+          <button type="submit">Submit rating</button>
+          </form>
+    {% endif %}      
+        <h4>Ratings for this movie</h4> 
           <ul>
                 {% for rating in movie.ratings %}
                 <li> {{rating.movie_score}}</li>
 
                 {% endfor %}
           </ul>  
-        </li>
-  </ul>
+        
+ 
 
-  <h3>Rate this movie</h3>
-
-  <form id="rating-form">
-  <label>
-  <input type="radio" name="rating" value="1">1
-  <input type="radio" name="rating" value="2">2
-  <input type="radio" name="rating" value="3">3
-  <input type="radio" name="rating" value="4">4
-  <input type="radio" name="rating" value="5">5
-  </label>
-  <button type="submit">Submit rating</button>
-  </form> 
-
+  
 
 
 

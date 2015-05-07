@@ -33,67 +33,42 @@ def movie_list():
     movies = Movie.query.order_by(Movie.movie_name).all()
     return render_template("movies.html", movies=movies)
 
-@app.route("/movies/<int:id>", methods=["GET"])
+@app.route("/movies/<int:id>")
 def display_movie_info(id):
     """Displays movie information and adds new movie rating or updates existing rating by user."""
 
     movie_object = Movie.query.filter_by(movie_id=id).one()
 
+    return render_template("movie_details.html", movie=movie_object)
 
 
-    new_rating = request.args.get("rating")
-    print new_rating
-    new_rating = int(new_rating)
+@app.route("/movies/<int:id>", methods=["POST"])
+def process_movie_rating(id):
+    new_rating_score = int(request.form.get("rating"))
 
     logged_in_email = session["logged_in_email"]
     logged_in_user_id = User.query.filter_by(email=logged_in_email).one().user_id # this gets the id of the logged in user
 
-    # query for the ratings that have the user_id = logged_in_user_id and the movie_id = id
-    
-    ## WE MIGHT NEED TO MOVE THIS TO A DIFFERENT ROUTE
-    existing_rating = Ratings.query.filter_by(user_id = logged_in_user_id, movie_id = id).first()
+    # query for the rating that has the user_id = logged_in_user_id and the movie_id = id
+    existing_rating = Ratings.query.filter_by(user_id = logged_in_user_id, movie_id = id).first() # if the user has not rated the movie before, existing_rating will = None
 
-    if existing_rating:
-        existing_rating.movie_score = new_rating
-        flash("Your existing rating is updated from ", existing_rating.movie_score, "to ", new_rating)
-    else:
-        rating = Ratings(user_id=logged_in_user_id, movie_id=id, movie_score=new_rating)
-        flash("You have now rated this movie")
+    if existing_rating: # if our Ratings query returned a rating object, update the movie_score with new_rating
+        existing_rating_temp = existing_rating.movie_score #this stores our existing_rating in a temporary variable before it's updated and allows us to call it again in update_string.
+        existing_rating.movie_score = new_rating_score
+        update_string = "Your existing rating for %s is updated from %d to %d." % (existing_rating.movie.movie_name, existing_rating_temp, new_rating_score)
+        flash(update_string)
+        return redirect("/movies")
+
+    else: # if our Ratings query returned None, add a new rating to the database with the new_rating score
+        rating = Ratings(user_id=logged_in_user_id, movie_id=id, movie_score=new_rating_score)
         db.session.add(rating)
         db.session.commit()
 
-    return render_template("movie_details.html", movie=movie_object)
+        new_rating_string = "You have rated %s a score of %d." % (rating.movie.movie_name, new_rating_score)
 
-    # movie_id=2, score=5
-    #
-    # query for whether this user has a rating for movie_id=2
+        flash(new_rating_string)
 
-    # angela = Employee.query.filter_by(ssn='43234234324').first()
-    # if angela:
-    #      angela.salary = 4534543543
-    # else:
-    #      
-
-
-    # logged_in_user_object
-    # movie_object = Movie.query.filter_by(movie_id=id).one()
-
-
-
-    # existing_rating = Ratings.query.filter_by(ratings_id)
-
-    # user_object = User.query.filter_by(email=user_email).first()
-    # if user_object: # query returns none if user_email not in database
-    #     flash("Email already registered.")
-    #     return redirect('/registration')
-    # else:
-    #     user = User(email=user_email, password=user_password, age=user_age, zipcode=user_zipcode)
-    #     db.session.add(user)
-    #     db.session.commit()
-    #     flash("You have successfully registered.  Please log in.")      
-    #     return redirect('/login')
-
-
+        return redirect("/movies")
 
 
 @app.route('/login')
