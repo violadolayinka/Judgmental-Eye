@@ -33,42 +33,56 @@ def movie_list():
     movies = Movie.query.order_by(Movie.movie_name).all()
     return render_template("movies.html", movies=movies)
 
-@app.route("/movies/<int:id>")
-def display_movie_info(id):
+@app.route("/movies/<int:id>", methods=["GET", "POST"])
+def display_and_rate_movie(id):
+
     """Displays movie information and adds new movie rating or updates existing rating by user."""
 
-    movie_object = Movie.query.filter_by(movie_id=id).one()
+    # ## new stuff
+    # logged_in_email = session["logged_in_email"]
+    # logged_in_user_id = User.query.filter_by(email=logged_in_email).one().user_id # this gets the id of the logged in user
+    
+    # user_rating_for_movie = Ratings.query.filter_by(movie_id=id, user_id=logged_in_user_id).first().movie_score
+    
+    # if user_rating_for_movie:
+    #     user_rating_string = "Your current rating for this movie is %d" % (user_rating_for_movie)
+    # else:
+    #     user_rating_string = "You have not yet rated this movie."
 
-    return render_template("movie_details.html", movie=movie_object)
+    # ## new stuff
 
+    if request.method == "GET":
+        movie_object = Movie.query.filter_by(movie_id=id).one()
+        return render_template("movie_details.html", movie=movie_object)
 
-@app.route("/movies/<int:id>", methods=["POST"])
-def process_movie_rating(id):
-    new_rating_score = int(request.form.get("rating"))
+    else:
+        new_rating_score = int(request.form.get("rating"))
 
-    logged_in_email = session["logged_in_email"]
-    logged_in_user_id = User.query.filter_by(email=logged_in_email).one().user_id # this gets the id of the logged in user
+        logged_in_email = session["logged_in_email"]
+        logged_in_user_id = User.query.filter_by(email=logged_in_email).one().user_id # this gets the id of the logged in user
 
-    # query for the rating that has the user_id = logged_in_user_id and the movie_id = id
-    existing_rating = Ratings.query.filter_by(user_id = logged_in_user_id, movie_id = id).first() # if the user has not rated the movie before, existing_rating will = None
+        # query for the rating that has the user_id = logged_in_user_id and the movie_id = id
+        existing_rating = Ratings.query.filter_by(user_id = logged_in_user_id, movie_id = id).first() # if the user has not rated the movie before, existing_rating will = None
 
-    if existing_rating: # if our Ratings query returned a rating object, update the movie_score with new_rating
-        existing_rating_temp = existing_rating.movie_score #this stores our existing_rating in a temporary variable before it's updated and allows us to call it again in update_string.
-        existing_rating.movie_score = new_rating_score
-        update_string = "Your existing rating for %s is updated from %d to %d." % (existing_rating.movie.movie_name, existing_rating_temp, new_rating_score)
-        flash(update_string)
-        return redirect("/movies")
+        if existing_rating: # if our Ratings query returned a rating object, update the movie_score with new_rating
+            existing_rating_temp = existing_rating.movie_score #this stores our existing_rating in a temporary variable before it's updated and allows us to call it again in update_string.
+            existing_rating.movie_score = new_rating_score
+            db.session.add(existing_rating)
+            db.session.commit()
+            update_string = "Your existing rating for %s is updated from %d to %d." % (existing_rating.movie.movie_name, existing_rating_temp, new_rating_score)
+            flash(update_string)
+            return redirect("/movies")
 
-    else: # if our Ratings query returned None, add a new rating to the database with the new_rating score
-        rating = Ratings(user_id=logged_in_user_id, movie_id=id, movie_score=new_rating_score)
-        db.session.add(rating)
-        db.session.commit()
+        else: # if our Ratings query returned None, add a new rating to the database with the new_rating score
+            rating = Ratings(user_id=logged_in_user_id, movie_id=id, movie_score=new_rating_score)
+            db.session.add(rating)
+            db.session.commit()
 
-        new_rating_string = "You have rated %s a score of %d." % (rating.movie.movie_name, new_rating_score)
+            new_rating_string = "You have rated %s a score of %d." % (rating.movie.movie_name, new_rating_score)
 
-        flash(new_rating_string)
+            flash(new_rating_string)
 
-        return redirect("/movies")
+            return redirect("/movies")
 
 
 @app.route('/login')
