@@ -13,6 +13,8 @@
   
         <h3>Rate this movie</h3>
 
+        <p>{{user_rating_string}}</p>
+
         <form action="/movies/{{movie.movie_id}}", method="POST">
           <label>
           <input type="radio" name="rating" value="1">1

@@ -38,31 +38,22 @@ def display_and_rate_movie(id):
 
     """Displays movie information and adds new movie rating or updates existing rating by user."""
 
-    # ## new stuff
-    # logged_in_email = session["logged_in_email"]
-    # logged_in_user_id = User.query.filter_by(email=logged_in_email).one().user_id # this gets the id of the logged in user
-    
-    # user_rating_for_movie = Ratings.query.filter_by(movie_id=id, user_id=logged_in_user_id).first().movie_score
-    
-    # if user_rating_for_movie:
-    #     user_rating_string = "Your current rating for this movie is %d" % (user_rating_for_movie)
-    # else:
-    #     user_rating_string = "You have not yet rated this movie."
 
-    # ## new stuff
+    logged_in_email = session["logged_in_email"]
+    logged_in_user_id = User.query.filter_by(email=logged_in_email).one().user_id # this gets the id of the logged in user
+    # query for the rating that has the user_id = logged_in_user_id and the movie_id = id
+    existing_rating = Ratings.query.filter_by(user_id = logged_in_user_id, movie_id = id).first() # if the user has not rated the movie before, existing_rating will = None
+    if existing_rating: # if our Ratings query returned a rating object
+        user_rating_string = "Your current rating for this movie is %d" % (existing_rating.movie_score)
+    else:
+        user_rating_string = "You have not yet rated this movie."
 
     if request.method == "GET":
         movie_object = Movie.query.filter_by(movie_id=id).one()
-        return render_template("movie_details.html", movie=movie_object)
+        return render_template("movie_details.html", movie=movie_object, user_rating_string=user_rating_string)
 
     else:
         new_rating_score = int(request.form.get("rating"))
-
-        logged_in_email = session["logged_in_email"]
-        logged_in_user_id = User.query.filter_by(email=logged_in_email).one().user_id # this gets the id of the logged in user
-
-        # query for the rating that has the user_id = logged_in_user_id and the movie_id = id
-        existing_rating = Ratings.query.filter_by(user_id = logged_in_user_id, movie_id = id).first() # if the user has not rated the movie before, existing_rating will = None
 
         if existing_rating: # if our Ratings query returned a rating object, update the movie_score with new_rating
             existing_rating_temp = existing_rating.movie_score #this stores our existing_rating in a temporary variable before it's updated and allows us to call it again in update_string.
