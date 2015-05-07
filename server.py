@@ -8,7 +8,7 @@ from jinja2 import StrictUndefined
 
 # from flask_debugtoolbar import DebugToolbarExtension
 
-
+     #   <li><a href= {{ movie.imbd_url }}> View this movie's IMBD page</a></li>
 
 app = Flask(__name__)
 
@@ -25,6 +25,19 @@ def index():
     """Homepage."""
 
     return render_template("homepage.html")
+
+@app.route("/movies")
+def movie_list():
+    """Show list of movies."""
+
+    movies = Movie.query.order_by(Movie.movie_name).all()
+    return render_template("movies.html", movies=movies)
+
+@app.route("/movies/<int:id>")
+def display_movie_info(id):
+    movie_object = Movie.query.filter_by(movie_id=id).one()
+
+    return render_template("movie_details.html", movie=movie_object)
 
 @app.route('/login')
 def login_page():
@@ -95,9 +108,8 @@ def user_list():
 @app.route("/user/<int:id>")
 def display_user_info(id):
     user_object = User.query.filter_by(user_id=id).one()
-    user_ratings = user_object.ratings
 
-    return render_template("user.html", user=user_object, user_ratings=user_ratings)
+    return render_template("user.html", user=user_object)
 
 
 if __name__ == "__main__":

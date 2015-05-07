@@ -5,7 +5,7 @@ from datetime import datetime
 from server import app
 
 # import time
-start = time.time()
+# start = time.time()
 
 
 def load_users():
@@ -28,7 +28,7 @@ def load_movies():
         movie_info = line.rstrip().split("|")
         if movie_info[2]: 
             release_date = datetime.strptime(movie_info[2], "%d-%b-%Y")
-        movie = Movie(movie_name=movie_info[1][:-7], release_date=release_date, imdb_url=movie_info[3])
+        movie = Movie(movie_name=movie_info[1][:-7], release_date=release_date, imdb_url=movie_info[4])
         db.session.add(movie)
 
     # print "The load_movies for loop took", time.time() - start, "ms to run"    
