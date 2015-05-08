@@ -49,7 +49,8 @@ def display_and_rate_movie(id):
         if existing_rating: # if our Ratings query returned a rating object
             user_rating_string = "Your current rating for this movie is %d" % (existing_rating.movie_score)
         else:
-            user_rating_string = "You have not yet rated this movie."
+            ## prediction code goes here.
+            user_rating_string = "You have not yet rated this movie.  Your predicted rating is...."
 
         if request.method == "GET":
             movie_object = Movie.query.filter_by(movie_id=id).one()
