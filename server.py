@@ -5,8 +5,10 @@ from model import User, Ratings, Movie, connect_to_db, db
 
 from jinja2 import StrictUndefined
 
+import correlation
 
-from flask_debugtoolbar import DebugToolbarExtension
+
+# from flask_debugtoolbar import DebugToolbarExtension
 
      #   <li><a href= {{ movie.imbd_url }}> View this movie's IMBD page</a></li>
 
